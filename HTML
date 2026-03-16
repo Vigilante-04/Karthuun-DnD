@@ -2,22 +2,46 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Karthuun NPC Codex</title>
-
+<title>Karthuun World</title>
 <style>
 body {
     font-family: "Georgia", serif;
     background: #111;
     color: #eee;
     margin: 0;
+}
+
+header {
+    background: #222;
+    padding: 15px;
+    display: flex;
+    justify-content: center;
+}
+
+header button {
+    background: #333;
+    color: #eee;
+    border: none;
+    padding: 10px 20px;
+    margin: 0 5px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+header button.active {
+    background: #555;
+}
+
+section {
+    display: none;
     padding: 20px;
 }
 
-h1 {
-    text-align: center;
-    margin-bottom: 40px;
+section.active {
+    display: block;
 }
 
+/* NPC Cards */
 #npcContainer {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -67,20 +91,50 @@ h1 {
 }
 </style>
 </head>
-
 <body>
-<h1>Karthuun NPC Codex</h1>
 
-<div id="npcContainer"></div>
+<header>
+    <button class="tabButton active" data-target="npcTab">NPCs</button>
+    <button class="tabButton" data-target="locationTab">Locations</button>
+    <button class="tabButton" data-target="mapTab">Map (Coming Soon)</button>
+</header>
+
+<section id="npcTab" class="active">
+    <h1>NPC Tracker</h1>
+    <div id="npcContainer"></div>
+</section>
+
+<section id="locationTab">
+    <h1>Locations</h1>
+    <p>Location index coming soon...</p>
+</section>
+
+<section id="mapTab">
+    <h1>Map</h1>
+    <p>Map functionality coming soon...</p>
+</section>
 
 <script>
+// Tabs
+const buttons = document.querySelectorAll(".tabButton");
+buttons.forEach(btn=>{
+    btn.addEventListener("click",()=>{
+        // Remove active from all
+        buttons.forEach(b=>b.classList.remove("active"));
+        document.querySelectorAll("section").forEach(s=>s.classList.remove("active"));
+
+        btn.classList.add("active");
+        document.getElementById(btn.dataset.target).classList.add("active");
+    });
+});
+
+// --- NPC Loader ---
 const NPC_SHEET_CSV_URL =
 "https://docs.google.com/spreadsheets/d/e/2PACX-1vSMWKaNuiGKg_JmWT6G-eIm_2b9djoLisLoLkoRXvVDjo9xvUBK3HJrhnilNSA4kNMO9PxVYqlZz69U/pub?gid=0&single=true&output=csv";
 
 const LOCATION_SHEET_CSV_URL =
 "https://docs.google.com/spreadsheets/d/e/2PACX-1vSMWKaNuiGKg_JmWT6G-eIm_2b9djoLisLoLkoRXvVDjo9xvUBK3HJrhnilNSA4kNMO9PxVYqlZz69U/pub?gid=30016903&single=true&output=csv";
 
-// Helper to convert Google Drive link to direct image
 function driveLinkToDirect(url) {
     if(!url) return "";
     let fileIdMatch = url.match(/\/d\/([a-zA-Z0-9_-]+)\//);
@@ -90,7 +144,6 @@ function driveLinkToDirect(url) {
     return url;
 }
 
-// Load CSV as array of objects
 async function loadCSV(url) {
     const res = await fetch(url);
     const text = await res.text();
@@ -107,15 +160,11 @@ async function loadCSV(url) {
 async function buildNPCs(){
     const npcs = await loadCSV(NPC_SHEET_CSV_URL);
     const locations = await loadCSV(LOCATION_SHEET_CSV_URL);
-
     const container = document.getElementById("npcContainer");
 
     npcs.forEach(npc => {
-        // Find matching location background
         const location = locations.find(l => l["Location Name"].trim() === npc["Last Known Location"].trim());
         const bgImg = location ? driveLinkToDirect(location["Location Image"]) : "";
-
-        // NPC image
         const npcImg = driveLinkToDirect(npc["Picture"]);
 
         const card = document.createElement("div");
@@ -141,5 +190,6 @@ async function buildNPCs(){
 
 buildNPCs();
 </script>
+
 </body>
 </html>
