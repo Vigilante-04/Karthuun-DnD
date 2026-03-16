@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Karthuun DnD - Spells</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+    <button class="backButton" onclick="window.location='index.html'">← Back</button>
+    <h1>Spells</h1>
+</header>
+
+<div class="search-bar">
+    <input type="text" id="spellSearch" placeholder="Search Spells...">
+    <select id="spellEffect"><option value="">All Effects</option></select>
+</div>
+
+<div id="spellContainer"></div>
+<div id="cardPopup" class="card-popup"></div>
+
+<script src="script.js"></script>
+<script>
+(async function(){
+    const CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSMWKaNuiGKg_JmWT6G-eIm_2b9djoLisLoLkoRXvVDjo9xvUBK3HJrhnilNSA4kNMO9PxVYqlZz69U/pub?gid=1940236964&single=true&output=csv";
+    const spells = await loadCSV(CSV);
+    const effects = new Set(); spells.forEach(s=>{ if(s["Damage/Effect"]) effects.add(s["Damage/Effect"]); });
+    [...effects].sort().forEach(v=>document.getElementById("spellEffect").appendChild(Object.assign(document.createElement("option"), {value:v,textContent:v})));
+    const columns=["Name","Cast Time","Duration","Range/Area","Attack/Save","Damage/Effect"];
+    attachSearch("spellSearch", {"Damage/Effect":document.getElementById("spellEffect")}, spells, "spellContainer", columns, "Image");
+    buildList("spellContainer", spells, columns, "Image");
+})();
+</script>
+</body>
+</html>
