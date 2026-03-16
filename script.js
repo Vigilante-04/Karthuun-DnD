@@ -50,22 +50,24 @@ error:reject
 }
 
 
-// Convert Google Drive share → image
+// Automatically converts any Google Drive "view" or "file/d/ID/view" link to a direct image link
+function driveImage(url) {
+    if(!url) return "";
 
-function driveImage(url){
+    // Match patterns like /d/FILEID/
+    let match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+    if(match) {
+        return `https://drive.google.com/uc?export=view&id=${match[1]}`;
+    }
 
-if(!url) return ""
+    // Match links that use id=FILEID directly
+    match = url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+    if(match){
+        return `https://drive.google.com/uc?export=view&id=${match[1]}`;
+    }
 
-let match = url.match(/\/d\/([a-zA-Z0-9_-]+)/)
-
-if(match){
-
-return `https://lh3.googleusercontent.com/d/${match[1]}`
-
-}
-
-return ""
-
+    // fallback: return the original url
+    return url;
 }
 
 
