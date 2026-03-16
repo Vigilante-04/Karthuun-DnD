@@ -11,9 +11,10 @@ buttons.forEach(btn=>{
 
 // ---------------- CSV URLs ----------------
 const NPC_SHEET_CSV_URL =
-"YOUR_NPC_CSV_PUBLISH_URL"; // Replace with your published Google Sheet CSV link
+"https://docs.google.com/spreadsheets/d/e/2PACX-1vSMWKaNuiGKg_JmWT6G-eIm_2b9djoLisLoLkoRXvVDjo9xvUBK3HJrhnilNSA4kNMO9PxVYqlZz69U/pub?gid=0&single=true&output=csv";
+
 const LOCATION_SHEET_CSV_URL =
-"YOUR_LOCATION_CSV_PUBLISH_URL"; // Replace with your published Location sheet CSV link
+"https://docs.google.com/spreadsheets/d/e/2PACX-1vSMWKaNuiGKg_JmWT6G-eIm_2b9djoLisLoLkoRXvVDjo9xvUBK3HJrhnilNSA4kNMO9PxVYqlZz69U/pub?gid=30016903&single=true&output=csv";
 
 // ---------------- Helpers ----------------
 function driveLinkToDirect(url) {
