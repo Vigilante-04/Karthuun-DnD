@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Caelvorn NPCs</title>
+
+<style>
+
+body{
+font-family:Arial;
+background:#1a1a1a;
+color:white;
+margin:20px;
+}
+
+.controls{
+margin-bottom:20px;
+}
+
+input,select{
+padding:6px;
+margin-right:10px;
+}
+
+.location-group{
+margin-top:40px;
+}
+
+.location-title{
+font-size:28px;
+margin-bottom:15px;
+border-bottom:2px solid #555;
+}
+
+.npc-container{
+display:flex;
+flex-wrap:wrap;
+gap:20px;
+}
+
+.npc-card{
+width:320px;
+background-size:cover;
+background-position:center;
+border-radius:10px;
+overflow:hidden;
+box-shadow:0 0 10px rgba(0,0,0,0.8);
+position:relative;
+}
+
+.npc-overlay{
+background:rgba(0,0,0,0.6);
+padding:10px;
+}
+
+.npc-image{
+position:absolute;
+bottom:90px;
+left:50%;
+transform:translateX(-50%);
+max-height:200px;
+pointer-events:none;
+}
+
+.npc-info{
+background:rgba(0,0,0,0.85);
+padding:12px;
+}
+
+.npc-info h3{
+margin:0;
+}
+
+</style>
+</head>
+
+<body>
+
+<h1>Caelvorn NPC Index</h1>
+
+<div class="controls">
+
+<input id="searchName" placeholder="Search Name">
+
+<select id="raceFilter">
+<option value="">All Races</option>
+</select>
+
+<select id="genderFilter">
+<option value="">All Sex</option>
+</select>
+
+<select id="locationFilter">
+<option value="">All Locations</option>
+</select>
+
+</div>
+
+<div id="npcDisplay"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.2/papaparse.min.js"></script>
+
+<script>
+
+const NPC_URL = "NPC_SHEET_CSV_URL"
+const LOCATION_URL = "LOCATION_SHEET_CSV_URL"
+
+let npcData = []
+let locationMap = {}
+
+function loadSheets(){
+
+Promise.all([
+fetch(NPC_URL).then(r=>r.text()),
+fetch(LOCATION_URL).then(r=>r.text())
+]).then(([npcCSV,locCSV])=>{
+
+const npcParsed = Papa.parse(npcCSV,{header:true})
+const locParsed = Papa.parse(locCSV,{header:true})
+
+npcData = npcParsed.data
+
+locParsed.data.forEach(loc=>{
+if(loc["Location Name"]){
+locationMap[loc["Location Name"]] = loc["Location Image"]
+}
+})
+
+populateFilters()
+
+renderNPCs()
+
+})
+
+}
+
+function populateFilters(){
+
+const races = new Set()
+const genders = new Set()
+const locations = new Set()
+
+npcData.forEach(npc=>{
+if(npc.Race) races.add(npc.Race)
+if(npc.Gender) genders.add(npc.Gender)
+if(npc["Last Known Location"]) locations.add(npc["Last Known Location"])
+})
+
+const raceFilter = document.getElementById("raceFilter")
+races.forEach(r=>raceFilter.innerHTML += `<option>${r}</option>`)
+
+const genderFilter = document.getElementById("genderFilter")
+genders.forEach(g=>genderFilter.innerHTML += `<option>${g}</option>`)
+
+const locationFilter = document.getElementById("locationFilter")
+locations.forEach(l=>locationFilter.innerHTML += `<option>${l}</option>`)
+
+}
+
+function renderNPCs(){
+
+const nameSearch = document.getElementById("searchName").value.toLowerCase()
+const raceFilter = document.getElementById("raceFilter").value
+const genderFilter = document.getElementById("genderFilter").value
+const locationFilter = document.getElementById("locationFilter").value
+
+let filtered = npcData.filter(npc=>{
+
+return (
+(!raceFilter || npc.Race === raceFilter) &&
+(!genderFilter || npc.Gender === genderFilter) &&
+(!locationFilter || npc["Last Known Location"] === locationFilter) &&
+(!nameSearch || npc.Name.toLowerCase().includes(nameSearch))
+)
+
+})
+
+filtered.sort((a,b)=> a.Name.localeCompare(b.Name))
+
+const grouped = {}
+
+filtered.forEach(npc=>{
+
+const loc = npc["Last Known Location"] || "Unknown"
+
+if(!grouped[loc]) grouped[loc] = []
+
+grouped[loc].push(npc)
+
+})
+
+const display = document.getElementById("npcDisplay")
+
+display.innerHTML = ""
+
+Object.keys(grouped).forEach(loc=>{
+
+const locDiv = document.createElement("div")
+locDiv.className="location-group"
+
+const title = document.createElement("div")
+title.className="location-title"
+title.innerText = loc
+
+locDiv.appendChild(title)
+
+const container = document.createElement("div")
+container.className="npc-container"
+
+grouped[loc].forEach(npc=>{
+
+const bg = locationMap[loc] || ""
+
+const card = document.createElement("div")
+card.className="npc-card"
+card.style.backgroundImage=`url(${bg})`
+
+card.innerHTML = `
+
+<img class="npc-image" src="${npc.Picture}">
+
+<div class="npc-overlay"></div>
+
+<div class="npc-info">
+
+<h3>${npc["Title/Alias"]} ${npc.Name} ${npc.Surname}</h3>
+
+<p><b>Race:</b> ${npc.Race}</p>
+<p><b>Gender:</b> ${npc.Gender}</p>
+<p><b>Status:</b> ${npc.Status}</p>
+<p><b>Faction:</b> ${npc["Faction/Affiliation"]}</p>
+<p><b>Occupation:</b> ${npc["Occupation/Role"]}</p>
+
+</div>
+`
+
+container.appendChild(card)
+
+})
+
+locDiv.appendChild(container)
+
+display.appendChild(locDiv)
+
+})
+
+}
+
+document.querySelectorAll("input,select").forEach(el=>{
+el.addEventListener("input",renderNPCs)
+})
+
+loadSheets()
+
+</script>
+
+</body>
+</html>
