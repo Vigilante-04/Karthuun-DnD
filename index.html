@@ -1,46 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
 <meta charset="UTF-8">
-<title>Caelvorn Codex</title>
-
+<title>Caelvorn NPC Tracker</title>
 <link rel="stylesheet" href="style.css">
-
 <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
-
 </head>
-
 <body>
 
 <header>
-
-<h1>Caelvorn Codex</h1>
-
-<div class="controls">
-
-<input id="searchBox" placeholder="Search NPC">
-
-<select id="statusFilter">
-<option value="">All Status</option>
-<option>Alive</option>
-<option>Deceased</option>
-<option>Unknown</option>
-</select>
-
-</div>
-
+    <h1>Caelvorn NPC Tracker</h1>
+    <div class="filters">
+        <input id="searchBox" placeholder="Search NPC">
+        <select id="factionFilter"><option value="">All Factions</option></select>
+        <select id="sexFilter"><option value="">All Sexes</option></select>
+        <select id="raceFilter"><option value="">All Races</option></select>
+        <select id="locationFilter"><option value="">All Locations</option></select>
+    </div>
 </header>
 
-
 <main>
+    <!-- NPC List -->
+    <ul id="npcList"></ul>
 
-<div id="npcContainer"></div>
-
+    <!-- Full card overlay -->
+    <div id="npcOverlay">
+        <div class="overlayContent">
+            <span id="closeOverlay">&times;</span>
+            <div id="fullCard"></div>
+        </div>
+    </div>
 </main>
 
 <script src="script.js"></script>
-
 </body>
-
 </html>
