@@ -1,179 +1,194 @@
-body{
-    margin:0;
-    font-family:Georgia,serif;
-    background:#0f0f0f;
-    color:#eee;
+/* ---------------- GENERAL ---------------- */
+body {
+    font-family: "Georgia", serif;
+    background: #111;
+    color: #eee;
+    margin: 0;
+    padding: 0;
 }
 
-h1{
-    text-align:center;
-    margin:20px 0;
+h1, h2, h3 {
+    text-align: center;
 }
 
-section{
-    display:none;
-    padding:20px;
+/* ---------------- LANDING PAGE ---------------- */
+#landingPage {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
 }
 
-section.active{
-    display:block;
+.landingButtons {
+    display: flex;
+    gap: 30px;
+    margin: 30px 0;
 }
 
-.backBtn{
-    margin-bottom:15px;
-    padding:8px 12px;
-    font-size:16px;
-    cursor:pointer;
-    background:#222;
-    border:1px solid #444;
-    color:#eee;
-    border-radius:5px;
+.landingBtn {
+    width: 200px;
+    height: 200px;
+    font-size: 18px;
+    border-radius: 15px;
+    border: 2px solid #eee;
+    background-size: cover;
+    background-position: center;
+    cursor: pointer;
+    transition: transform 0.3s, box-shadow 0.3s;
 }
 
-input, select{
-    background:#222;
-    border:1px solid #444;
-    color:#eee;
-    padding:6px;
-    margin-right:5px;
-    margin-bottom:10px;
+.landingBtn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(255,255,255,0.5);
 }
 
-.landingButtons{
-    display:flex;
-    justify-content:center;
-    gap:20px;
-    flex-wrap:wrap;
-    margin-top:40px;
+input[type=text] {
+    width: 50%;
+    padding: 10px;
+    border-radius: 8px;
+    border: none;
+    margin: 10px 0;
 }
 
-.landingBtn{
-    position:relative;
-    width:200px;
-    height:200px;
-    background:#222;
-    border-radius:12px;
-    display:flex;
-    flex-direction:column;
-    justify-content:flex-end;
-    align-items:center;
-    color:#eee;
-    font-size:18px;
-    font-weight:bold;
-    cursor:pointer;
-    overflow:hidden;
-    transition:.3s;
-    text-align:center;
+/* ---------------- BACK BUTTON ---------------- */
+.backBtn {
+    background: #333;
+    color: #fff;
+    border: none;
+    padding: 10px 15px;
+    margin: 15px;
+    cursor: pointer;
+    border-radius: 5px;
 }
 
-.landingBtn:hover{
-    background:#333;
+/* ---------------- FILTERS ---------------- */
+.filters {
+    display: flex;
+    gap: 10px;
+    margin: 15px;
+    flex-wrap: wrap;
 }
 
-.btnImage{
-    position:absolute;
-    width:100%;
-    height:100%;
-    object-fit:cover;
-    top:0;
-    left:0;
-    opacity:.5;
-    z-index:0;
+select {
+    padding: 5px;
+    border-radius: 5px;
+    border: none;
 }
 
-.landingBtn span{
-    z-index:1;
-    margin-bottom:10px;
+/* ---------------- NPC TABLE ---------------- */
+table {
+    width: 90%;
+    margin: 0 auto;
+    border-collapse: collapse;
 }
 
-/* NPC Table */
-table{
-    width:100%;
-    border-collapse:collapse;
-    margin-top:10px;
+th, td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #333;
 }
 
-th, td{
-    padding:10px;
-    border-bottom:1px solid #333;
-    text-align:left;
+th {
+    cursor: pointer;
 }
 
-tr:hover{
-    background:#222;
-    cursor:pointer;
+tr:hover {
+    background: #222;
 }
 
-th{
-    cursor:pointer;
-    background:#1a1a1a;
+.npcListImg {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 10px;
+    vertical-align: middle;
 }
 
-/* Location List */
-#locationList{
-    list-style:none;
-    padding:0;
-    display:grid;
-    grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
-    gap:15px;
+/* ---------------- OVERLAY ---------------- */
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.95);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+    overflow-y: auto;
 }
 
-#locationList li{
-    background:#1b1b1b;
-    padding:10px;
-    border-radius:8px;
-    cursor:pointer;
-    text-align:center;
+.overlayContent {
+    position: relative;
+    max-width: 800px;
+    width: 90%;
+    background: #1d1d1d;
+    padding: 20px;
+    border-radius: 15px;
 }
 
-#locationList img{
-    width:100%;
-    height:100px;
-    object-fit:cover;
-    border-radius:5px;
+.overlay .backBtn {
+    position: absolute;
+    top: 10px;
+    right: 15px;
 }
 
-#locationOverlay{
-    display:none;
-    position:fixed;
-    top:0; left:0;
-    width:100%;
-    height:100%;
-    background:rgba(0,0,0,.95);
-    justify-content:center;
-    align-items:center;
-    z-index:999;
+/* ---------------- NPC CARD ---------------- */
+.npcCard {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
-.overlayContent{
-    position:relative;
-    max-width:700px;
-    width:90%;
-    background:#111;
-    padding:20px;
-    border-radius:12px;
+.npcCard img.npcImg {
+    width: 200px;
+    height: 200px;
+    border-radius: 15px;
+    object-fit: cover;
+    margin-bottom: 15px;
 }
 
-#closeLocationOverlay{
-    position:absolute;
-    top:10px; right:15px;
-    font-size:28px;
-    cursor:pointer;
+/* ---------------- LOCATION LIST ---------------- */
+.locationRow {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin: 10px;
+    cursor: pointer;
 }
 
-#locationImage{
-    width:100%;
-    max-height:400px;
-    object-fit:cover;
-    border-radius:10px;
-    margin-bottom:10px;
+.locationImg {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 10px;
 }
 
-.mapPlaceholder{
-    text-align:center;
-    font-size:16px;
-    margin-top:10px;
-    padding:10px;
-    background:#222;
-    border-radius:8px;
+.locationCard img.locationFullImg {
+    width: 100%;
+    border-radius: 15px;
+    margin-bottom: 10px;
+}
+
+.mapCircle {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 50%;
+    padding: 10px;
+    font-weight: bold;
+}
+
+/* ---------------- RESPONSIVE ---------------- */
+@media(max-width:768px){
+    .landingButtons {
+        flex-direction: column;
+    }
+    input[type=text] {
+        width: 80%;
+    }
 }
