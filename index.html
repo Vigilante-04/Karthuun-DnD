@@ -1,49 +1,46 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
 <meta charset="UTF-8">
-<title>Karthuun World</title>
+<title>Caelvorn Codex</title>
+
 <link rel="stylesheet" href="style.css">
 
-<!-- CSV Parser -->
 <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+
 </head>
 
 <body>
 
 <header>
-<button class="tabButton active" data-target="npcTab">NPCs</button>
-<button class="tabButton" data-target="locationTab">Locations</button>
-<button class="tabButton" data-target="mapTab">Map</button>
-</header>
 
-<section id="npcTab" class="active">
-
-<h1>NPC Tracker</h1>
+<h1>Caelvorn Codex</h1>
 
 <div class="controls">
-<input id="searchBox" placeholder="Search NPC...">
 
-<select id="factionFilter">
-<option value="">All Factions</option>
+<input id="searchBox" placeholder="Search NPC">
+
+<select id="statusFilter">
+<option value="">All Status</option>
+<option>Alive</option>
+<option>Deceased</option>
+<option>Unknown</option>
 </select>
+
 </div>
+
+</header>
+
+
+<main>
 
 <div id="npcContainer"></div>
 
-</section>
-
-<section id="locationTab">
-<h1>Locations</h1>
-<div id="locationContainer"></div>
-</section>
-
-<section id="mapTab">
-<h1>Map</h1>
-<p>Interactive map coming later.</p>
-</section>
+</main>
 
 <script src="script.js"></script>
 
 </body>
+
 </html>
