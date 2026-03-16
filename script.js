@@ -1,21 +1,4 @@
-// ---------------- Tabs ----------------
-
-document.querySelectorAll(".tabButton").forEach(btn=>{
-
-btn.addEventListener("click",()=>{
-
-document.querySelectorAll(".tabButton").forEach(b=>b.classList.remove("active"))
-document.querySelectorAll("section").forEach(s=>s.classList.remove("active"))
-
-btn.classList.add("active")
-document.getElementById(btn.dataset.target).classList.add("active")
-
-})
-
-})
-
-
-// ---------------- CSV URLs ----------------
+// GOOGLE SHEET CSV URLs
 
 const NPC_SHEET =
 "https://docs.google.com/spreadsheets/d/e/2PACX-1vSMWKaNuiGKg_JmWT6G-eIm_2b9djoLisLoLkoRXvVDjo9xvUBK3HJrhnilNSA4kNMO9PxVYqlZz69U/pub?gid=0&single=true&output=csv"
@@ -24,31 +7,34 @@ const LOCATION_SHEET =
 "https://docs.google.com/spreadsheets/d/e/2PACX-1vSMWKaNuiGKg_JmWT6G-eIm_2b9djoLisLoLkoRXvVDjo9xvUBK3HJrhnilNSA4kNMO9PxVYqlZz69U/pub?gid=30016903&single=true&output=csv"
 
 
-// ---------------- Data ----------------
-
-let NPCS = []
-let LOCATIONS = []
+let NPCS=[]
+let LOCATIONS=[]
 
 
-// ---------------- CSV Loader ----------------
+// CSV loader
 
 async function loadCSV(url){
 
 return new Promise((resolve,reject)=>{
 
 Papa.parse(url,{
+
 download:true,
 header:true,
 skipEmptyLines:true,
 
-complete:(results)=>{
+complete:(res)=>{
 
-const clean = results.data.map(r=>{
+const clean = res.data.map(r=>{
+
 let obj={}
+
 Object.keys(r).forEach(k=>{
 obj[k.trim()] = (r[k]||"").trim()
 })
+
 return obj
+
 })
 
 resolve(clean)
@@ -64,123 +50,158 @@ error:reject
 }
 
 
-// ---------------- Image System ----------------
+// Convert Google Drive share → image
 
-function driveImage(id){
+function driveImage(url){
 
-if(!id) return ""
+if(!url) return ""
 
-return `https://lh3.googleusercontent.com/d/${id}`
+let match = url.match(/\/d\/([a-zA-Z0-9_-]+)/)
+
+if(match){
+
+return `https://lh3.googleusercontent.com/d/${match[1]}`
+
+}
+
+return ""
 
 }
 
 
-function preloadImages(list){
+// Find location background
 
-list.forEach(src=>{
-if(!src) return
-const img = new Image()
-img.src = src
-})
+function getLocationImage(name){
+
+let loc = LOCATIONS.find(l=>
+l["Location Name"]?.toLowerCase() === name?.toLowerCase()
+)
+
+if(!loc) return ""
+
+return driveImage(loc["Location Image"])
 
 }
 
 
-// ---------------- NPC Rendering ----------------
+// Render NPC cards
 
 function renderNPCs(list){
 
-const container = document.getElementById("npcContainer")
+const container=document.getElementById("npcContainer")
 container.innerHTML=""
 
 list.forEach(npc=>{
 
-const location = LOCATIONS.find(l=>
-l["Location Name"]?.toLowerCase() === npc["Last Known Location"]?.toLowerCase()
-)
+const portrait = driveImage(npc["Picture"])
+const bg = getLocationImage(npc["Last Known Location"])
 
-const npcImg = driveImage(npc["Picture"])
-const bgImg = location ? driveImage(location["Location Image"]) : ""
-
-const card = document.createElement("div")
+const card=document.createElement("div")
 card.className="card"
 
-card.innerHTML = `
+card.innerHTML=`
 
-${bgImg ? `<img class="background" src="${bgImg}" loading="lazy">` : ""}
+<div class="cardBackground" style="background-image:url('${bg}')"></div>
 
-${npcImg ? `<img class="npcImage" src="${npcImg}" loading="lazy" onerror="this.style.display='none'">` : ""}
+<div class="cardOverlay"></div>
 
-<div class="info">
+<img class="npcPortrait"
+src="${portrait}"
+loading="lazy"
+onerror="this.style.display='none'">
+
+<div class="cardContent">
 
 <h2>${npc["Title/Alias"]||""} ${npc["Name"]||""} ${npc["Surname"]||""}</h2>
 
-<p><b>Status:</b> ${npc["Status"]}</p>
-<p><b>Race:</b> ${npc["Race"]}</p>
-<p><b>Faction:</b> ${npc["Faction/Affiliation"]}</p>
-<p><b>Role:</b> ${npc["Occupation/Role"]}</p>
+<div class="meta">
 
-<p><b>Met:</b> ${npc["Location Met"]}</p>
-<p><b>Last Known:</b> ${npc["Last Known Location"]}</p>
-
-<p>${npc["Relationship & Knowledge of"]}</p>
+<span>${npc["Race"]}</span>
+<span>${npc["Status"]}</span>
+<span>${npc["Faction/Affiliation"]}</span>
 
 </div>
 
+<div class="role">${npc["Occupation/Role"]||""}</div>
+
+<button class="loreBtn">Lore</button>
+
+<div class="lore">
+
+<p><b>Met:</b> ${npc["Location Met"]}</p>
+
+<p><b>Last Seen:</b> ${npc["Last Known Location"]}</p>
+
+<p>${npc["Relationship & Knowledge of"]||""}</p>
+
+</div>
+
+</div>
 `
 
 container.appendChild(card)
 
 })
 
+activateLoreButtons()
+
 }
 
 
-// ---------------- Locations ----------------
+// Lore expand
 
-function renderLocations(){
+function activateLoreButtons(){
 
-const container = document.getElementById("locationContainer")
-container.innerHTML=""
+document.querySelectorAll(".loreBtn").forEach(btn=>{
 
-LOCATIONS.forEach(loc=>{
+btn.onclick=()=>{
 
-const img = driveImage(loc["Location Image"])
+const lore=btn.nextElementSibling
 
-const div = document.createElement("div")
-div.className="locationCard"
+lore.classList.toggle("open")
 
-div.innerHTML = `
-
-<h3>${loc["Location Name"]}</h3>
-
-${img ? `<img src="${img}" loading="lazy">` : ""}
-
-`
-
-container.appendChild(div)
+}
 
 })
 
 }
 
 
-// ---------------- Initialize ----------------
+// Filters
+
+function applyFilters(){
+
+let search=document.getElementById("searchBox").value.toLowerCase()
+let status=document.getElementById("statusFilter").value
+
+let filtered=NPCS.filter(n=>{
+
+let name=`${n["Title/Alias"]} ${n["Name"]} ${n["Surname"]}`.toLowerCase()
+
+let matchesSearch=name.includes(search)
+
+let matchesStatus=!status || n["Status"]===status
+
+return matchesSearch && matchesStatus
+
+})
+
+renderNPCs(filtered)
+
+}
+
+
+// INIT
 
 async function init(){
 
 NPCS = await loadCSV(NPC_SHEET)
 LOCATIONS = await loadCSV(LOCATION_SHEET)
 
-const images = []
-
-NPCS.forEach(n=>images.push(driveImage(n["Picture"])))
-LOCATIONS.forEach(l=>images.push(driveImage(l["Location Image"])))
-
-preloadImages(images)
-
 renderNPCs(NPCS)
-renderLocations()
+
+document.getElementById("searchBox").addEventListener("input",applyFilters)
+document.getElementById("statusFilter").addEventListener("change",applyFilters)
 
 }
 
