@@ -1,102 +1,145 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Karthuun NPC Index</title>
+<title>Karthuun NPC Codex</title>
 
 <style>
-body{
-    background:#111;
-    color:#eee;
-    font-family:serif;
-    padding:40px;
+body {
+    font-family: "Georgia", serif;
+    background: #111;
+    color: #eee;
+    margin: 0;
+    padding: 20px;
 }
 
-h1{
-    text-align:center;
+h1 {
+    text-align: center;
+    margin-bottom: 40px;
 }
 
-#npcContainer{
-    display:grid;
-    grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
-    gap:20px;
+#npcContainer {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 25px;
 }
 
-.card{
-    background:#1d1d1d;
-    border-radius:10px;
-    padding:15px;
+.card {
+    position: relative;
+    background: #1d1d1d;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 0 15px rgba(0,0,0,0.7);
 }
 
-.card img{
-    width:100%;
-    border-radius:6px;
+.card .background {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    opacity: 0.6;
 }
 
-.name{
-    font-size:20px;
-    font-weight:bold;
+.card img.npcImage {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 3px solid #fff;
+    object-fit: cover;
+    z-index: 2;
 }
 
-.meta{
-    font-size:14px;
-    opacity:0.8;
+.card .info {
+    padding: 150px 15px 15px 15px;
+}
+
+.card .info h2 {
+    margin: 0 0 5px 0;
+}
+
+.card .info p {
+    margin: 2px 0;
+    font-size: 14px;
+    opacity: 0.9;
 }
 </style>
-
 </head>
 
 <body>
-
-<h1>Karthuun NPC Index</h1>
+<h1>Karthuun NPC Codex</h1>
 
 <div id="npcContainer"></div>
 
 <script>
-
 const NPC_SHEET_CSV_URL =
 "https://docs.google.com/spreadsheets/d/e/2PACX-1vSMWKaNuiGKg_JmWT6G-eIm_2b9djoLisLoLkoRXvVDjo9xvUBK3HJrhnilNSA4kNMO9PxVYqlZz69U/pub?gid=0&single=true&output=csv";
 
-async function loadNPCs(){
+const LOCATION_SHEET_CSV_URL =
+"https://docs.google.com/spreadsheets/d/e/2PACX-1vSMWKaNuiGKg_JmWT6G-eIm_2b9djoLisLoLkoRXvVDjo9xvUBK3HJrhnilNSA4kNMO9PxVYqlZz69U/pub?gid=30016903&single=true&output=csv";
 
-    const response = await fetch(NPC_SHEET_CSV_URL);
-    const data = await response.text();
+// Helper to convert Google Drive link to direct image
+function driveLinkToDirect(url) {
+    if(!url) return "";
+    let fileIdMatch = url.match(/\/d\/([a-zA-Z0-9_-]+)\//);
+    if(fileIdMatch){
+        return `https://drive.google.com/uc?export=view&id=${fileIdMatch[1]}`;
+    }
+    return url;
+}
 
-    const rows = data.split("\n").slice(1);
+// Load CSV as array of objects
+async function loadCSV(url) {
+    const res = await fetch(url);
+    const text = await res.text();
+    const lines = text.split("\n").filter(l=>l.trim()!=="");
+    const headers = lines[0].split(",");
+    return lines.slice(1).map(line => {
+        const cols = line.split(",");
+        let obj = {};
+        headers.forEach((h,i)=> obj[h.trim()] = cols[i] || "");
+        return obj;
+    });
+}
+
+async function buildNPCs(){
+    const npcs = await loadCSV(NPC_SHEET_CSV_URL);
+    const locations = await loadCSV(LOCATION_SHEET_CSV_URL);
 
     const container = document.getElementById("npcContainer");
 
-    rows.forEach(row=>{
+    npcs.forEach(npc => {
+        // Find matching location background
+        const location = locations.find(l => l["Location Name"].trim() === npc["Last Known Location"].trim());
+        const bgImg = location ? driveLinkToDirect(location["Location Image"]) : "";
 
-        const cols = row.split(",");
-
-        const name = cols[3] || "";
-        const surname = cols[4] || "";
-        const race = cols[6] || "";
-        const role = cols[9] || "";
-        const location = cols[10] || "";
-        const image = cols[13] || "";
+        // NPC image
+        const npcImg = driveLinkToDirect(npc["Picture"]);
 
         const card = document.createElement("div");
         card.className = "card";
-
         card.innerHTML = `
-        ${image ? `<img src="${image.replace("/view","/preview")}">` : ""}
-        <div class="name">${name} ${surname}</div>
-        <div class="meta">${race}</div>
-        <div class="meta">${role}</div>
-        <div class="meta">Met: ${location}</div>
+            ${bgImg ? `<img class="background" src="${bgImg}">` : ""}
+            ${npcImg ? `<img class="npcImage" src="${npcImg}">` : ""}
+            <div class="info">
+                <h2>${npc["Title/Alias"]} ${npc["Name"]} ${npc["Surname"]}</h2>
+                <p>Status: ${npc["Status"]}</p>
+                <p>Race: ${npc["Race"]}</p>
+                <p>Gender: ${npc["Gender"]}</p>
+                <p>Faction: ${npc["Faction/Affiliation"]}</p>
+                <p>Role: ${npc["Occupation/Role"]}</p>
+                <p>Met: ${npc["Location Met"]}</p>
+                <p>Last Known Location: ${npc["Last Known Location"]}</p>
+                <p>Relationship & Knowledge: ${npc["Relationship & Knowledge of"]}</p>
+            </div>
         `;
-
         container.appendChild(card);
-
     });
-
 }
 
-loadNPCs();
-
+buildNPCs();
 </script>
-
 </body>
 </html>
