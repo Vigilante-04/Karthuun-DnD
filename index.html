@@ -2,80 +2,46 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Karthuun DnD Campaign</title>
+<title>Karthuun DnD</title>
 <link rel="stylesheet" href="style.css">
-<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 </head>
 <body>
 
-<!-- Landing Page -->
-<section id="landing" class="active">
+<!-- LANDING PAGE -->
+<section id="landingPage">
     <h1>Welcome to Karthuun DnD Campaign</h1>
-    <input id="landingSearch" type="text" placeholder="Search NPC by name...">
     <div class="landingButtons">
-        <div class="landingBtn" data-target="npcPage">
-            <img class="btnImage" src="" alt="NPCs">
-            <span>NPCs</span>
-        </div>
-        <div class="landingBtn" data-target="locationPage">
-            <img class="btnImage" src="" alt="Locations">
-            <span>Locations</span>
-        </div>
-        <div class="landingBtn" data-target="mapPage">
-            <img class="btnImage" src="" alt="Map">
-            <span>Map (Coming Soon)</span>
-        </div>
+        <button id="landingNPCBtn" class="landingBtn"></button>
+        <button id="landingLocationBtn" class="landingBtn"></button>
+        <button class="landingBtn" disabled>Map (Coming Soon)</button>
     </div>
+    <input type="text" id="landingSearch" placeholder="Search NPCs or Locations...">
 </section>
 
-<!-- NPC Page -->
-<section id="npcPage">
-    <button class="backBtn" data-target="landing">&larr; Back</button>
-    <h1>NPC Tracker</h1>
+<!-- NPC PAGE -->
+<section id="npcPage" style="display:none">
+    <button class="backBtn" id="backToLandingNPC">← Back</button>
     <div class="filters">
-        <input id="npcSearch" placeholder="Search NPC by name, race, or type...">
-        <select id="raceFilter"><option value="">All Races</option></select>
-        <select id="sexFilter"><option value="">All Sexes</option></select>
-        <select id="locationFilter"><option value="">All Locations</option></select>
+        <input type="text" id="npcSearch" placeholder="Search NPCs...">
+        <select id="raceFilter"></select>
+        <select id="genderFilter"></select>
+        <select id="locationFilter"></select>
     </div>
-    <table id="npcTable">
-        <thead>
-            <tr>
-                <th data-sort="Name">Name</th>
-                <th data-sort="Surname">Surname</th>
-                <th data-sort="Age">Age</th>
-                <th data-sort="Race">Race</th>
-                <th data-sort="Gender">Gender</th>
-                <th data-sort="Last Known Location">Last Known Location</th>
-            </tr>
-        </thead>
-        <tbody></tbody>
-    </table>
+    <div id="npcList"></div>
 </section>
 
-<!-- Location Page -->
-<section id="locationPage">
-    <button class="backBtn" data-target="landing">&larr; Back</button>
-    <h1>Locations</h1>
-    <input id="locationSearch" placeholder="Search Locations...">
-    <ul id="locationList"></ul>
-    <!-- Location Overlay -->
-    <div id="locationOverlay">
-        <div class="overlayContent">
-            <span id="closeLocationOverlay">&times;</span>
-            <img id="locationImage" src="">
-            <div id="locationDesc"></div>
-            <div class="mapPlaceholder">MAP coming soon...</div>
-        </div>
-    </div>
+<!-- NPC Overlay -->
+<div id="npcOverlay" class="overlay" style="display:none"></div>
+
+<!-- LOCATION PAGE -->
+<section id="locationPage" style="display:none">
+    <button class="backBtn" id="backToLandingLocation">← Back</button>
+    <input type="text" id="locationSearch" placeholder="Search Locations...">
+    <div id="locationList"></div>
 </section>
 
-<!-- Map Page -->
-<section id="mapPage">
-    <button class="backBtn" data-target="landing">&larr; Back</button>
-    <h1>Map</h1>
-    <p>Map functionality coming soon...</p>
-</section>
+<!-- Location Overlay -->
+<div id="locationOverlay" class="overlay" style="display:none"></div>
 
 <script src="script.js"></script>
 </body>
