@@ -1,33 +1,49 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Karthuun World</title>
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<title>Karthuun World</title>
+<link rel="stylesheet" href="style.css">
+
+<!-- CSV Parser -->
+<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 </head>
+
 <body>
 
 <header>
-    <button class="tabButton active" data-target="npcTab">NPCs</button>
-    <button class="tabButton" data-target="locationTab">Locations</button>
-    <button class="tabButton" data-target="mapTab">Map (Coming Soon)</button>
+<button class="tabButton active" data-target="npcTab">NPCs</button>
+<button class="tabButton" data-target="locationTab">Locations</button>
+<button class="tabButton" data-target="mapTab">Map</button>
 </header>
 
 <section id="npcTab" class="active">
-    <h1>NPC Tracker</h1>
-    <div id="npcContainer"></div>
+
+<h1>NPC Tracker</h1>
+
+<div class="controls">
+<input id="searchBox" placeholder="Search NPC...">
+
+<select id="factionFilter">
+<option value="">All Factions</option>
+</select>
+</div>
+
+<div id="npcContainer"></div>
+
 </section>
 
 <section id="locationTab">
-    <h1>Locations</h1>
-    <div id="locationContainer"></div>
+<h1>Locations</h1>
+<div id="locationContainer"></div>
 </section>
 
 <section id="mapTab">
-    <h1>Map</h1>
-    <p>Map functionality coming soon...</p>
+<h1>Map</h1>
+<p>Interactive map coming later.</p>
 </section>
 
 <script src="script.js"></script>
+
 </body>
 </html>
