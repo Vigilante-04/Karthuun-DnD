@@ -1,3 +1,25 @@
+function getDriveId(url) {
+    if (!url) return null;
+
+    // Handles all formats:
+    // /file/d/ID/view
+    // id=ID
+    // open?id=ID
+    const match = url.match(/[-\w]{25,}/);
+    return match ? match[0] : null;
+}
+
+function fixImageUrl(url) {
+    if (!url) return "";
+
+    const id = getDriveId(url);
+    if (!id) return url;
+
+    // ✅ Use proxy (this avoids ORB + CORS issues)
+    return `https://images.weserv.nl/?url=drive.google.com/uc?id=${id}&w=400`;
+}
+
+
 // ---------------- Google Drive Image Helper ----------------
 function driveLinkToDirect(url){
     if(!url) return "";
