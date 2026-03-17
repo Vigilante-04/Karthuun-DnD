@@ -1,45 +1,25 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<title>Karthuun DnD - NPCs</title>
-<link rel="stylesheet" href="style.css">
+    <title>NPCs</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js"></script>
 </head>
-<body>
-<header>
-    <button class="backButton" onclick="window.location='index.html'">← Back</button>
-    <h1>NPC Tracker</h1>
-</header>
 
-<div class="search-bar">
-    <input type="text" id="npcSearch" placeholder="Search NPCs...">
-    <select id="npcRace"><option value="">All Races</option></select>
-    <select id="npcGender"><option value="">All Genders</option></select>
-    <select id="npcLocation"><option value="">All Locations</option></select>
+<body onload="setupNav(); loadNPCs();">
+
+<div id="nav"></div>
+
+<h1 style="padding:20px;">NPCs</h1>
+
+<div id="list"></div>
+
+<div id="popup" class="popup">
+    <div class="popupInner">
+        <span class="popupClose" onclick="closePopup()">✖</span>
+        <div id="popupContent"></div>
+    </div>
 </div>
 
-<div id="npcContainer"></div>
-
-<div id="cardPopup" class="card-popup"></div>
-
-<script src="script.js"></script>
-<script>
-(async function(){
-    const NPC_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSMWKaNuiGKg_JmWT6G-eIm_2b9djoLisLoLkoRXvVDjo9xvUBK3HJrhnilNSA4kNMO9PxVYqlZz69U/pub?gid=0&single=true&output=csv";
-    let npcs = await loadCSV(NPC_CSV);
-    npcs = npcs.filter(n=> n["Active/Inactive"]==="Active"); // Only active NPCs
-
-    // Fill dropdowns
-    const raceSet = new Set(), genderSet = new Set(), locationSet = new Set();
-    npcs.forEach(n=>{ if(n["Race"]) raceSet.add(n["Race"]); if(n["Gender"]) genderSet.add(n["Gender"]); if(n["Last Known Location"]) locationSet.add(n["Last Known Location"]); });
-    const raceDD=document.getElementById("npcRace"); [...raceSet].sort().forEach(r=>{ const o=document.createElement("option"); o.value=r; o.textContent=r; raceDD.appendChild(o); });
-    const genderDD=document.getElementById("npcGender"); [...genderSet].sort().forEach(r=>{ const o=document.createElement("option"); o.value=r; o.textContent=r; genderDD.appendChild(o); });
-    const locationDD=document.getElementById("npcLocation"); [...locationSet].sort().forEach(r=>{ const o=document.createElement("option"); o.value=r; o.textContent=r; locationDD.appendChild(o); });
-
-    const columns = ["Title/Alias","Name","Surname","Age","Race","Gender","Last Known Location"];
-    attachSearch("npcSearch", {"Race":raceDD,"Gender":genderDD,"Last Known Location":locationDD}, npcs, "npcContainer", columns, "Picture");
-    buildList("npcContainer", npcs, columns, "Picture");
-})();
-</script>
 </body>
 </html>
