@@ -1,7 +1,13 @@
-/* ===== GLOBAL ===== */
+/* =========================
+   GLOBAL RESET
+========================= */
+* {
+    box-sizing: border-box;
+}
+
 body {
     margin: 0;
-    font-family: 'Georgia', serif;
+    font-family: Georgia, serif;
     background: #0b0b0b;
     color: #e0d8c3;
 }
@@ -11,7 +17,17 @@ h1, h2, h3 {
     letter-spacing: 1px;
 }
 
-/* ===== NAVBAR ===== */
+/* REMOVE DEFAULT BUTTON STYLING */
+button {
+    background: none;
+    border: none;
+    outline: none;
+    font-family: inherit;
+}
+
+/* =========================
+   NAVBAR
+========================= */
 #nav {
     display: flex;
     gap: 10px;
@@ -26,13 +42,16 @@ h1, h2, h3 {
     color: #d4c08a;
     padding: 8px 14px;
     cursor: pointer;
+    transition: 0.2s;
 }
 
 #nav button:hover {
     background: #2a2a2a;
 }
 
-/* ===== LANDING ===== */
+/* =========================
+   LANDING PAGE
+========================= */
 .landing {
     text-align: center;
     padding: 40px;
@@ -42,58 +61,89 @@ h1, h2, h3 {
     font-size: 36px;
 }
 
+/* MENU GRID FIXED */
 .menu {
     display: flex;
     flex-wrap: wrap;
-    gap: 20px;
     justify-content: center;
+    align-items: center;
+    gap: 25px;
+
+    max-width: 1200px;
+    margin: 40px auto;
 }
 
-/* FORCE proper tile size */
+/* BUTTONS FIXED SIZE */
 .menu button {
     width: 360px;
     height: 360px;
-    flex: 0 0 auto; /* 🔥 prevents stretching */
-
-    font-size: 20px;
-    color: white;
-    border: 2px solid #2e2a1f;
+    flex: 0 0 360px;
 
     background-size: cover;
     background-position: center;
+    background-repeat: no-repeat;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: #fff;
+    font-size: 22px;
+    text-shadow: 0 0 12px rgba(0,0,0,0.9);
 
     cursor: pointer;
     transition: 0.3s;
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    box-shadow: 0 0 25px rgba(0,0,0,0.7);
 
-    text-shadow: 0 0 10px rgba(0,0,0,0.8);
-    box-shadow: 0 0 20px rgba(0,0,0,0.6);
+    position: relative;
+    overflow: hidden;
 }
 
+/* DARK OVERLAY */
+.menu button::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.35);
+}
+
+/* KEEP TEXT ABOVE OVERLAY */
+.menu button span {
+    position: relative;
+    z-index: 2;
+}
+
+/* HOVER EFFECT */
 .menu button:hover {
     transform: scale(1.05);
     filter: brightness(1.2);
-    border-color: #8a6d2f;
 }
 
-/* ===== LIST ===== */
+/* =========================
+   LISTS (NPC, ITEMS, ETC)
+========================= */
 #list {
     padding: 20px;
 }
 
+/* DEFAULT ROW GRID */
 .row {
     display: grid;
     grid-template-columns: 60px repeat(6, 1fr);
     gap: 10px;
-    padding: 10px;
+    padding: 12px;
     border-bottom: 1px solid #222;
     cursor: pointer;
     align-items: center;
+    transition: 0.2s;
 }
 
+.row:hover {
+    background: #1a1a1a;
+}
+
+/* SMALL ICON IMAGES */
 .row img {
     width: 50px;
     height: 50px;
@@ -101,11 +151,9 @@ h1, h2, h3 {
     border-radius: 6px;
 }
 
-.row:hover {
-    background: #1a1a1a;
-}
-
-/* ===== POPUP ===== */
+/* =========================
+   POPUP (FULLSCREEN CARD)
+========================= */
 .popup {
     display: none;
     position: fixed;
@@ -115,16 +163,18 @@ h1, h2, h3 {
     overflow-y: auto;
 }
 
+/* CARD CONTAINER */
 .popupInner {
     max-width: 900px;
-    margin: 50px auto;
+    margin: 60px auto;
     background: #111;
-    padding: 20px;
+    padding: 25px;
     border: 1px solid #333;
     border-radius: 10px;
     position: relative;
 }
 
+/* CLOSE BUTTON */
 .popupClose {
     position: absolute;
     top: 10px;
@@ -133,7 +183,9 @@ h1, h2, h3 {
     cursor: pointer;
 }
 
-/* ===== CARD ===== */
+/* =========================
+   CARD CONTENT
+========================= */
 .card img {
     width: 100%;
     max-height: 400px;
@@ -143,22 +195,52 @@ h1, h2, h3 {
 }
 
 .card h2 {
-    margin-top: 0;
+    margin-top: 10px;
 }
 
-/* ===== MONSTER STATS ===== */
+.card p {
+    line-height: 1.5;
+}
+
+/* =========================
+   MONSTER STATS
+========================= */
 .stats {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 10px;
-    margin: 10px 0;
+    margin: 15px 0;
 }
 
-/* ===== HEX PLACEHOLDER ===== */
+.stats span {
+    background: #1a1a1a;
+    padding: 6px;
+    text-align: center;
+    border: 1px solid #333;
+}
+
+/* =========================
+   HEX MAP PLACEHOLDER
+========================= */
 .hex {
     margin-top: 20px;
     padding: 20px;
     border: 1px dashed #555;
     text-align: center;
     color: #888;
+}
+
+/* =========================
+   RESPONSIVE (OPTIONAL)
+========================= */
+@media (max-width: 800px) {
+    .menu button {
+        width: 90%;
+        height: 300px;
+        flex: 0 0 auto;
+    }
+
+    .row {
+        grid-template-columns: 50px repeat(2, 1fr);
+    }
 }
