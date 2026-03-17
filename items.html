@@ -1,32 +1,25 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<title>Karthuun DnD - Items</title>
-<link rel="stylesheet" href="style.css">
+    <title>Items</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js"></script>
 </head>
-<body>
-<header>
-    <button class="backButton" onclick="window.location='index.html'">← Back</button>
-    <h1>Items</h1>
-</header>
 
-<div class="search-bar">
-    <input type="text" id="itemSearch" placeholder="Search Items...">
+<body onload="setupNav(); loadItems();">
+
+<div id="nav"></div>
+
+<h1 style="padding:20px;">Items</h1>
+
+<div id="list"></div>
+
+<div id="popup" class="popup">
+    <div class="popupInner">
+        <span class="popupClose" onclick="closePopup()">✖</span>
+        <div id="popupContent"></div>
+    </div>
 </div>
 
-<div id="itemContainer"></div>
-<div id="cardPopup" class="card-popup"></div>
-
-<script src="script.js"></script>
-<script>
-(async function(){
-    const CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSMWKaNuiGKg_JmWT6G-eIm_2b9djoLisLoLkoRXvVDjo9xvUBK3HJrhnilNSA4kNMO9PxVYqlZz69U/pub?gid=1492959337&single=true&output=csv";
-    const items = await loadCSV(CSV);
-    const columns=["Name","Cost","Weight","Attributes"];
-    attachSearch("itemSearch", null, items, "itemContainer", columns, null);
-    buildList("itemContainer", items, columns, null);
-})();
-</script>
 </body>
 </html>
