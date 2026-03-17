@@ -1,34 +1,44 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<title>Karthuun DnD - Landing</title>
-<link rel="stylesheet" href="style.css">
+    <title>Karthuun Campaign</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js"></script>
 </head>
-<body>
-<section>
+
+<body onload="setupNav()">
+
+<div id="nav"></div>
+
+<div class="landing">
     <h1>Welcome to Karthuun DnD Campaign</h1>
-    <div class="landing-buttons">
-        <a href="npcs.html" class="button-card" id="npcBtn">NPCs</a>
-        <a href="locations.html" class="button-card" id="locBtn">Locations</a>
-        <a href="monsters.html" class="button-card" id="monsterBtn">Monsters</a>
-        <a href="items.html" class="button-card" id="itemBtn">Items</a>
-        <a href="spells.html" class="button-card" id="spellBtn">Spells</a>
-        <a href="hexmap.html" class="button-card" id="hexBtn">Hex Map</a>
+
+    <div class="menu">
+        <button onclick="go('npcs.html')" 
+        style="background-image:url('https://images.weserv.nl/?url=drive.google.com/uc?id=152kD4LyNkxOssxsk89iYT5w0odCDszyj')">
+        NPCs</button>
+
+        <button onclick="go('locations.html')" 
+        style="background-image:url('https://images.weserv.nl/?url=drive.google.com/uc?id=1wiTqY-tPBOkfS1io3W1BCsuSpVYTjFzP')">
+        Locations</button>
+
+        <button onclick="go('monsters.html')" 
+        style="background-image:url('https://images.weserv.nl/?url=drive.google.com/uc?id=1OQmJdD3Ca6c8unfbHLlf0QH_oDv2PzqD')">
+        Monsters</button>
+
+        <button onclick="go('items.html')" 
+        style="background-image:url('https://images.weserv.nl/?url=drive.google.com/uc?id=1OjkOCZoRLfgpszVxCyjdvboB9PjQHRpK')">
+        Items</button>
+
+        <button onclick="go('spells.html')" 
+        style="background-image:url('https://images.weserv.nl/?url=drive.google.com/uc?id=1yKT2YI2PKaThExt4IAHiI1o5cbA2mCn-')">
+        Spells</button>
+
+        <button>
+        Hex Map (Coming Soon)
+        </button>
     </div>
-    <div class="search-bar">
-        <input type="text" id="landingSearch" placeholder="Search all...">
-    </div>
-</section>
-<script src="script.js"></script>
-<script>
-// You can assign random images for landing buttons here if desired
-const btns = ["npcBtn","locBtn","monsterBtn","itemBtn","spellBtn","hexBtn"];
-btns.forEach(id=>{
-    const el = document.getElementById(id);
-    const randomImg = "https://picsum.photos/200/200?random=" + Math.floor(Math.random()*100);
-    el.style.backgroundImage = `url(${randomImg})`;
-});
-</script>
+</div>
+
 </body>
 </html>
