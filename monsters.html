@@ -1,40 +1,25 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<title>Karthuun DnD - Monsters</title>
-<link rel="stylesheet" href="style.css">
+    <title>Monsters</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js"></script>
 </head>
-<body>
-<header>
-    <button class="backButton" onclick="window.location='index.html'">← Back</button>
-    <h1>Monsters</h1>
-</header>
 
-<div class="search-bar">
-    <input type="text" id="monsterSearch" placeholder="Search Monsters...">
-    <select id="monsterType"><option value="">All Types</option></select>
-    <select id="monsterSize"><option value="">All Sizes</option></select>
-    <select id="monsterCR"><option value="">All CR</option></select>
+<body onload="setupNav(); loadMonsters();">
+
+<div id="nav"></div>
+
+<h1 style="padding:20px;">Monsters</h1>
+
+<div id="list"></div>
+
+<div id="popup" class="popup">
+    <div class="popupInner">
+        <span class="popupClose" onclick="closePopup()">✖</span>
+        <div id="popupContent"></div>
+    </div>
 </div>
 
-<div id="monsterContainer"></div>
-<div id="cardPopup" class="card-popup"></div>
-
-<script src="script.js"></script>
-<script>
-(async function(){
-    const CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSMWKaNuiGKg_JmWT6G-eIm_2b9djoLisLoLkoRXvVDjo9xvUBK3HJrhnilNSA4kNMO9PxVYqlZz69U/pub?gid=1165462310&single=true&output=csv";
-    const monsters = await loadCSV(CSV);
-    const types = new Set(), sizes = new Set(), crs = new Set();
-    monsters.forEach(m=>{ if(m["Monster Type"]) types.add(m["Monster Type"]); if(m["Size"]) sizes.add(m["Size"]); if(m["CR"]) crs.add(m["CR"]); });
-    [...types].sort().forEach(v=>document.getElementById("monsterType").appendChild(Object.assign(document.createElement("option"), {value:v,textContent:v})));
-    [...sizes].sort().forEach(v=>document.getElementById("monsterSize").appendChild(Object.assign(document.createElement("option"), {value:v,textContent:v})));
-    [...crs].sort().forEach(v=>document.getElementById("monsterCR").appendChild(Object.assign(document.createElement("option"), {value:v,textContent:v})));
-    const columns=["Monster Name","Monster Type","CR","Size","Expansion / HomeBrew"];
-    attachSearch("monsterSearch", {"Monster Type":document.getElementById("monsterType"),"Size":document.getElementById("monsterSize"),"CR":document.getElementById("monsterCR")}, monsters, "monsterContainer", columns, "Image");
-    buildList("monsterContainer", monsters, columns, "Image");
-})();
-</script>
 </body>
 </html>
