@@ -43,10 +43,10 @@ h1, h2, h3 {
 }
 
 .menu {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    display: flex;
+    flex-wrap: wrap;
     gap: 20px;
-    margin-top: 40px;
+    justify-content: center;
 }
 
 .menu button {
