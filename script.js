@@ -1,149 +1,223 @@
-function getDriveId(url) {
-    if (!url) return null;
+// ===============================
+// CONFIG
+// ===============================
+const CONFIG = {
+    sheets: {
+        npcs: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSMWKaNuiGKg_JmWT6G-eIm_2b9djoLisLoLkoRXvVDjo9xvUBK3HJrhnilNSA4kNMO9PxVYqlZz69U/pub?gid=0&single=true&output=csv",
+        locations: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSMWKaNuiGKg_JmWT6G-eIm_2b9djoLisLoLkoRXvVDjo9xvUBK3HJrhnilNSA4kNMO9PxVYqlZz69U/pub?gid=30016903&single=true&output=csv",
+        monsters: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSMWKaNuiGKg_JmWT6G-eIm_2b9djoLisLoLkoRXvVDjo9xvUBK3HJrhnilNSA4kNMO9PxVYqlZz69U/pub?gid=1165462310&single=true&output=csv",
+        items: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSMWKaNuiGKg_JmWT6G-eIm_2b9djoLisLoLkoRXvVDjo9xvUBK3HJrhnilNSA4kNMO9PxVYqlZz69U/pub?gid=1492959337&single=true&output=csv"
+    }
+};
 
-    // Handles all formats:
-    // /file/d/ID/view
-    // id=ID
-    // open?id=ID
-    const match = url.match(/[-\w]{25,}/);
+// ===============================
+// IMAGE PIPELINE (PRODUCTION)
+// ===============================
+function getDriveId(url) {
+    const match = url?.match(/[-\w]{25,}/);
     return match ? match[0] : null;
 }
 
-function fixImageUrl(url) {
-    if (!url) return "";
+function img(url, size = 300) {
+    if (!url) return "images/placeholder.png";
 
     const id = getDriveId(url);
     if (!id) return url;
 
-    // ✅ Use proxy (this avoids ORB + CORS issues)
-    return `https://images.weserv.nl/?url=drive.google.com/uc?id=${id}&w=400`;
+    return `https://images.weserv.nl/?url=drive.google.com/uc?id=${id}&w=${size}&q=80`;
 }
 
-
-// ---------------- Google Drive Image Helper ----------------
-function driveLinkToDirect(url){
-    if(!url) return "";
-    const match = url.match(/\/d\/([a-zA-Z0-9_-]+)\//);
-    return match ? `https://drive.google.com/uc?export=view&id=${match[1]}` : url;
-}
-
-// ---------------- CSV Loader ----------------
-async function loadCSV(url){
+// ===============================
+// CSV PARSER
+// ===============================
+async function fetchCSV(url) {
     const res = await fetch(url);
-    if(!res.ok) throw new Error("Failed to fetch CSV");
     const text = await res.text();
-    const lines = text.split("\n").filter(l=>l.trim()!=="");
-    const headers = lines[0].split(",").map(h=>h.trim());
-    return lines.slice(1).map(line=>{
-        const cols = line.split(",");
-        const obj = {};
-        headers.forEach((h,i)=> obj[h]=cols[i]||"");
+
+    const rows = text.split("\n").map(r => r.split(","));
+    const headers = rows.shift();
+
+    return rows.map(r => {
+        let obj = {};
+        headers.forEach((h, i) => obj[h.trim()] = r[i]?.trim());
         return obj;
     });
 }
 
-// ---------------- Sort Helper ----------------
-function sortByColumn(array, key){
-    return array.sort((a,b)=>{
-        const A = (a[key]||"").toLowerCase();
-        const B = (b[key]||"").toLowerCase();
-        return A < B ? -1 : A > B ? 1 : 0;
-    });
-}
+// ===============================
+// NAVIGATION
+// ===============================
+function setupNav() {
+    const nav = document.getElementById("nav");
+    if (!nav) return;
 
-// ---------------- Filter Helper ----------------
-function filterData(data, searchText, dropdownFilters={}){
-    return data.filter(item=>{
-        const searchMatch = searchText
-            ? Object.values(item).some(v=>v.toLowerCase().includes(searchText.toLowerCase()))
-            : true;
-        const dropdownMatch = Object.entries(dropdownFilters).every(([k,v])=>{
-            return !v || item[k]===v;
-        });
-        return searchMatch && dropdownMatch;
-    });
-}
-
-// ---------------- List Builder ----------------
-function buildList(containerId, data, columns, smallImgKey){
-    const container = document.getElementById(containerId);
-    container.innerHTML = "";
-    const table = document.createElement("table");
-    table.className="list-table";
-
-    const thead = document.createElement("thead");
-    const trHead = document.createElement("tr");
-    columns.forEach(col=>{
-        const th = document.createElement("th");
-        th.textContent = col;
-        th.onclick=()=>{ 
-            const sorted = sortByColumn(data, col);
-            buildList(containerId, sorted, columns, smallImgKey);
-        };
-        trHead.appendChild(th);
-    });
-    thead.appendChild(trHead);
-    table.appendChild(thead);
-
-    const tbody = document.createElement("tbody");
-    data.forEach(item=>{
-        const tr = document.createElement("tr");
-        if(smallImgKey){
-            const tdImg = document.createElement("td");
-            const img = document.createElement("img");
-            img.src = driveLinkToDirect(item[smallImgKey]);
-            img.className="small-img";
-            tdImg.appendChild(img);
-            tr.appendChild(tdImg);
-        }
-        columns.forEach(col=>{
-            if(col!==smallImgKey){
-                const td = document.createElement("td");
-                td.textContent = item[col] || "";
-                tr.appendChild(td);
-            }
-        });
-        tr.onclick=()=> showPopup(item);
-        tbody.appendChild(tr);
-    });
-    table.appendChild(tbody);
-    container.appendChild(table);
-}
-
-// ---------------- Popup ----------------
-function showPopup(data){
-    const popup = document.getElementById("cardPopup");
-    const content = popup.querySelector(".card-content");
-    content.innerHTML=`
-        <span class="close-btn" onclick="closePopup()">×</span>
-        ${data["Picture"] ? `<img class="full-img" src="${driveLinkToDirect(data["Picture"])}">` : ""}
-        ${Object.entries(data).map(([k,v])=>{
-            if(k!=="Picture") return `<p><strong>${k}:</strong> ${v}</p>`;
-        }).join("")}
+    nav.innerHTML = `
+        <button onclick="go('index.html')">🏠 Home</button>
+        <button onclick="go('npcs.html')">NPCs</button>
+        <button onclick="go('locations.html')">Locations</button>
+        <button onclick="go('monsters.html')">Monsters</button>
+        <button onclick="go('items.html')">Items</button>
     `;
-    popup.style.display="flex";
 }
 
-function closePopup(){
-    document.getElementById("cardPopup").style.display="none";
+function go(page) {
+    window.location.href = page;
 }
 
-// ---------------- Dropdown Search Handler ----------------
-function attachSearch(inputId, dropdowns, data, containerId, columns, smallImgKey){
-    const input = document.getElementById(inputId);
-    const dd = dropdowns || {};
-    input.addEventListener("input", ()=>{
-        const filterObj = {};
-        Object.entries(dd).forEach(([k,sel])=> filterObj[k] = sel.value);
-        const filtered = filterData(data, input.value, filterObj);
-        buildList(containerId, filtered, columns, smallImgKey);
-    });
-    Object.entries(dd).forEach(([k,sel])=>{
-        sel.addEventListener("change", ()=>{
-            const filterObj = {};
-            Object.entries(dd).forEach(([k,sel])=> filterObj[k] = sel.value);
-            const filtered = filterData(data, input.value, filterObj);
-            buildList(containerId, filtered, columns, smallImgKey);
-        });
-    });
+// ===============================
+// POPUP SYSTEM
+// ===============================
+function showPopup(html) {
+    const el = document.getElementById("popupContent");
+    document.getElementById("popup").style.display = "block";
+    el.innerHTML = html;
+}
+
+function closePopup() {
+    document.getElementById("popup").style.display = "none";
+}
+
+// ===============================
+// NPC SYSTEM
+// ===============================
+async function loadNPCs() {
+    let data = await fetchCSV(CONFIG.sheets.npcs);
+
+    // Only ACTIVE NPCs
+    data = data.filter(n => n["Active/Inactive"] === "Active");
+
+    buildNPCList(data);
+}
+
+function buildNPCList(data) {
+    const container = document.getElementById("list");
+
+    container.innerHTML = data.map(n => `
+        <div class="row" onclick='openNPC(${JSON.stringify(n)})'>
+            <img src="${img(n["Picture"], 80)}">
+            <span>${n.Name}</span>
+            <span>${n.Surname}</span>
+            <span>${n.Age}</span>
+            <span>${n.Race}</span>
+            <span>${n.Gender}</span>
+            <span>${n["Last Known Location"]}</span>
+        </div>
+    `).join("");
+}
+
+function openNPC(n) {
+    showPopup(`
+        <div class="card">
+            <img src="${img(n["Picture"], 800)}">
+            <h2>${n.Name} ${n.Surname}</h2>
+            <p>${n["Title/Alias"]}</p>
+            <p><b>Race:</b> ${n.Race}</p>
+            <p><b>Gender:</b> ${n.Gender}</p>
+            <p><b>Location:</b> ${n["Last Known Location"]}</p>
+        </div>
+    `);
+}
+
+// ===============================
+// LOCATIONS
+// ===============================
+async function loadLocations() {
+    const data = await fetchCSV(CONFIG.sheets.locations);
+
+    document.getElementById("list").innerHTML = data.map(l => `
+        <div class="row" onclick='openLocation(${JSON.stringify(l)})'>
+            <img src="${img(l["Location Image"], 80)}">
+            <span>${l["Location Name"]}</span>
+        </div>
+    `).join("");
+}
+
+function openLocation(l) {
+    showPopup(`
+        <div class="card">
+            <img src="${img(l["Location Image"], 800)}">
+            <h2>${l["Location Name"]}</h2>
+            <p>${l.Description}</p>
+            <div class="hex">Hex Map Coming Soon</div>
+        </div>
+    `);
+}
+
+// ===============================
+// MONSTERS
+// ===============================
+async function loadMonsters() {
+    const data = await fetchCSV(CONFIG.sheets.monsters);
+
+    document.getElementById("list").innerHTML = data.map(m => `
+        <div class="row" onclick='openMonster(${JSON.stringify(m)})'>
+            <img src="${img(m.Image, 80)}">
+            <span>${m["Monster Name"]}</span>
+            <span>${m["Monster Type"]}</span>
+            <span>${m.CR}</span>
+        </div>
+    `).join("");
+}
+
+function openMonster(m) {
+    showPopup(`
+        <div class="card monster">
+            <img src="${img(m.Image, 800)}">
+            <h2>${m["Monster Name"]}</h2>
+            <p>${m["Monster Type"]} | CR ${m.CR}</p>
+
+            <div class="stats">
+                <span>HP: ${m["Stats HP"]}</span>
+                <span>AC: ${m["Stats AC"]}</span>
+                <span>STR: ${m["Stats STR"]}</span>
+                <span>DEX: ${m["Stats DEX"]}</span>
+                <span>CON: ${m["Stats CON"]}</span>
+                <span>INT: ${m["Stats INT"]}</span>
+                <span>WIS: ${m["Stats WIS"]}</span>
+                <span>CHA: ${m["Stats CHA"]}</span>
+            </div>
+
+            <p><b>Actions:</b></p>
+            <ul>
+                <li>${m["Action 01"]}</li>
+                <li>${m["Action 02"]}</li>
+                <li>${m["Action 03"]}</li>
+                <li>${m["Action 04"]}</li>
+            </ul>
+
+            <p><b>Lore:</b> ${m.Lore}</p>
+            <p><b>Tactics:</b> ${m.Tactics}</p>
+        </div>
+    `);
+}
+
+// ===============================
+// ITEMS
+// ===============================
+async function loadItems() {
+    const data = await fetchCSV(CONFIG.sheets.items);
+
+    document.getElementById("list").innerHTML = data.map(i => `
+        <div class="row" onclick='openItem(${JSON.stringify(i)})'>
+            <img src="${img(i.Image, 80)}">
+            <span>${i.Name}</span>
+            <span>${i.Type}</span>
+            <span>${i.Cost}</span>
+            <span>${i.Weight}</span>
+            <span>${i.Attributes}</span>
+        </div>
+    `).join("");
+}
+
+function openItem(i) {
+    showPopup(`
+        <div class="card">
+            <img src="${img(i.Image, 800)}">
+            <h2>${i.Name}</h2>
+            <p><b>Type:</b> ${i.Type}</p>
+            <p><b>Cost:</b> ${i.Cost}</p>
+            <p><b>Weight:</b> ${i.Weight}</p>
+            <p>${i.Description}</p>
+        </div>
+    `);
 }
